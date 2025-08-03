@@ -1,0 +1,15 @@
+name: Guardian
+version: RELEASE (1.0)
+main: Frxne.guardian.Guardian
+api-version: '1.21'
+author: Frxme
+description: Ein einfaches, performantes Block- und Container-Logging Plugin.
+database: true
+
+permissions:
+  guardian.lookup:
+    description: Erlaubt die Nutzung des /lookup Befehls (Blockverlauf).
+    default: op
+  guardian.inspect:
+    description: Erlaubt die Nutzung von /inspect (Inspector-Modus) und /guardian (Containerverlauf).
+    default: op
