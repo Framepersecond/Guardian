@@ -1,0 +1,114 @@
+<div align="center">
+
+# 🛡️ Guardian
+
+**Lightweight Block & Container Logging for Paper Servers**
+
+[![API](https://img.shields.io/badge/API-1.21+-blue?style=for-the-badge)](https://papermc.io/)
+[![Java](https://img.shields.io/badge/Java-17+-orange?style=for-the-badge)](https://adoptium.net/)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-green?style=for-the-badge)](LICENSE)
+
+*Track who did what, when. Simple. Fast. Reliable.*
+
+</div>
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 📦 **Block Logging** | Track all block breaks and placements with player attribution |
+| 📦 **Container Logging** | Monitor item additions and removals from chests, barrels, etc. |
+| 🔍 **Inspector Mode** | Click blocks directly to view their history |
+| ⚙️ **Settings GUI** | Easy-to-use interface for personal preferences |
+| ⚡ **Async Database** | Zero lag - all operations run in the background |
+| 💾 **SQLite Storage** | No external database setup required |
+| 🗄️ **Double Chest Support** | Correct handling of large container logging |
+
+---
+
+## 📥 Installation
+
+```
+1. 📁 Download the latest Guardian.jar from releases
+2. 📂 Drop it into your server's plugins folder  
+3. 🔄 Restart your server
+4. ✅ Done! Database created automatically
+```
+
+---
+
+## 💻 Commands
+
+| Command | Description | Permission |
+|:--------|:------------|:-----------|
+| `/lookup [page]` | 🔍 View block history at targeted block | `guardian.lookup` |
+| `/inspect` | 👁️ Toggle inspector mode | `guardian.inspect` |
+| `/guardian [page]` | 📦 View container item history | `guardian.inspect` |
+| `/gsettings` | ⚙️ Open settings GUI | `guardian.settings` |
+
+### 🔗 Aliases
+
+| Main Command | Aliases |
+|:-------------|:--------|
+| `/lookup` | `/guard`, `/glookup` |
+| `/inspect` | `/ginspect`, `/gi` |
+| `/guardian` | `/gcont` |
+| `/gsettings` | `/guardiansettings`, `/gset` |
+
+---
+
+## 🔐 Permissions
+
+| Permission | Description | Default |
+|:-----------|:------------|:--------|
+| `guardian.lookup` | Access block history lookup | OP |
+| `guardian.inspect` | Access inspector mode & container history | OP |
+| `guardian.settings` | Access settings GUI | OP |
+
+---
+
+## 🔍 Inspector Mode
+
+Toggle with `/inspect` for interactive lookups:
+
+| Action | Result |
+|:-------|:-------|
+| **Left-click** any block | View block break/place history |
+| **Right-click** a container | View item add/remove history |
+| **Right-click** non-container | View block history |
+
+> 💡 All interactions are cancelled in inspector mode to prevent accidents!
+
+---
+
+## ⚙️ Settings GUI
+
+Open with `/gsettings` to configure:
+
+- 👤 **Hide Own Actions** - Filter your actions from lookup results
+
+---
+
+## 📋 Supported Versions
+
+| Requirement | Version |
+|:------------|:--------|
+| Minecraft | 1.21 - 1.21.5 |
+| Server | Paper, Purpur, or compatible forks |
+| Java | 17+ |
+
+---
+
+<div align="center">
+
+## 📜 License
+
+[BSD 3-Clause License](LICENSE)
+
+---
+
+**Made with ❤️ by Frxme**
+
+</div>
