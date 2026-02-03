@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="dark" lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Guardian - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0e8",
+                        "bg-dark": "#0a0b10",
+                        "bg-dark-end": "#12141d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        * {
+            transition: all 0.2s ease;
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .glow {
+            box-shadow: 0 0 40px rgba(0, 240, 232, 0.2), 0 0 80px rgba(0, 240, 232, 0.1);
+        }
+
+        .grid-bg {
+            background-size: 50px 50px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            animation: gridFade 20s ease-in-out infinite;
+        }
+
+        @keyframes gridFade {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(0, 240, 232, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 50px rgba(0, 240, 232, 0.5);
+            }
+        }
+
+        .logo-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .logo-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        .tab {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(0, 240, 232, 0.15) 0%, rgba(0, 240, 232, 0.05) 100%);
+            color: #00f0e8;
+            border-color: rgba(0, 240, 232, 0.5);
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .auth-form {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(0, 240, 232, 0.15);
+        }
+
+        button[type="submit"] {
+            position: relative;
+            overflow: hidden;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 30px rgba(0, 240, 232, 0.4);
+        }
+
+        button[type="submit"]:active {
+            transform: scale(0.98);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00f0e8 0%, #06b6d4 50%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+
+            /* Prevent zoom */
+            html {
+                touch-action: manipulation;
+            }
+
+            .glass-panel {
+                margin: 1rem;
+                padding: 1.5rem !important;
+                border-radius: 1.5rem;
+                max-width: calc(100vw - 2rem);
+            }
+
+            .logo-float {
+                width: 3.5rem !important;
+                height: 3.5rem !important;
+            }
+
+            h1 {
+                font-size: 1.5rem !important;
+            }
+
+            /* Prevent iOS zoom on input focus */
+            input,
+            select {
+                font-size: 16px !important;
+                min-height: 48px;
+            }
+
+            button {
+                min-height: 48px;
+                padding: 0.75rem 1rem !important;
+            }
+
+            .tab {
+                padding: 0.625rem 0.75rem !important;
+                font-size: 0.875rem;
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .glass-panel {
+                margin: 0.5rem;
+                padding: 1rem !important;
+            }
+
+            h1 {
+                font-size: 1.25rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gradient-to-br from-bg-dark to-bg-dark-end text-slate-200 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
+    <div
+        class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px] pointer-events-none">
+    </div>
+    <div
+        class="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none">
+    </div>
+
+    <!-- Auth Card -->
+    <div class="glass-panel rounded-3xl p-8 w-full max-w-md relative z-10 glow">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <div
+                class="logo-float logo-glow w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-primary/80 to-cyan-700 flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-black text-3xl">security</span>
+            </div>
+            <h1 class="text-2xl font-bold gradient-text">Guardian</h1>
+            <p class="text-slate-400 text-sm mt-1">Minecraft Server Logging</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6">
+            <button class="tab active flex-1 py-2.5 rounded-xl text-sm font-medium border border-transparent"
+                data-tab="login">Anmelden</button>
+            <button
+                class="tab flex-1 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white border border-transparent hover:bg-white/5"
+                data-tab="register">Registrieren</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form active space-y-4">
+            <div>
+                <label for="loginUsername" class="block text-sm font-medium text-slate-400 mb-2">Benutzername</label>
+                <input type="text" id="loginUsername" required autocomplete="username"
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+            </div>
+            <div>
+                <label for="loginPassword" class="block text-sm font-medium text-slate-400 mb-2">Passwort</label>
+                <input type="password" id="loginPassword" required autocomplete="current-password"
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+            </div>
+            <button type="submit"
+                class="w-full py-3 rounded-xl bg-primary text-black font-bold text-sm hover:bg-cyan-300 transition-colors shadow-[0_0_20px_rgba(0,240,232,0.3)] mt-6">
+                Anmelden
+            </button>
+            <div id="loginError" class="text-red-400 text-sm text-center mt-4 hidden"></div>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form space-y-4">
+            <div>
+                <label for="registerCode"
+                    class="block text-sm font-medium text-slate-400 mb-2">Registrierungscode</label>
+                <input type="text" id="registerCode" placeholder="XXXXXXXX" required maxlength="8"
+                    style="text-transform: uppercase;"
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-mono tracking-wider">
+                <p class="text-slate-500 text-xs mt-2">Führe <code class="text-primary">/guardian register</code> im
+                    Spiel aus</p>
+            </div>
+            <div>
+                <label for="registerUsername" class="block text-sm font-medium text-slate-400 mb-2">Benutzername</label>
+                <input type="text" id="registerUsername" required minlength="3" maxlength="32" autocomplete="username"
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+            </div>
+            <div>
+                <label for="registerPassword" class="block text-sm font-medium text-slate-400 mb-2">Passwort</label>
+                <input type="password" id="registerPassword" required minlength="6" autocomplete="new-password"
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+            </div>
+            <div>
+                <label for="registerPasswordConfirm" class="block text-sm font-medium text-slate-400 mb-2">Passwort
+                    bestätigen</label>
+                <input type="password" id="registerPasswordConfirm" required minlength="6" autocomplete="new-password"
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+            </div>
+            <button type="submit"
+                class="w-full py-3 rounded-xl bg-primary text-black font-bold text-sm hover:bg-cyan-300 transition-colors shadow-[0_0_20px_rgba(0,240,232,0.3)] mt-6">
+                Registrieren
+            </button>
+            <div id="registerError" class="text-red-400 text-sm text-center mt-4 hidden"></div>
+        </form>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+
+</html>

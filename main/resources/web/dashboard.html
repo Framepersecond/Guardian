@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html class="dark" lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Guardian - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0e8",
+                        "bg-dark": "#0a0b10",
+                        "bg-dark-end": "#12141d",
+                        "glass-border": "rgba(255, 255, 255, 0.05)",
+                        "glass-bg": "rgba(20, 20, 25, 0.6)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        * {
+            transition: all 0.2s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-panel:hover {
+            background: rgba(25, 25, 32, 0.7);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item-active {
+            background: linear-gradient(90deg, rgba(0, 240, 232, 0.15) 0%, transparent 100%);
+            color: #00f0e8;
+            border-left: 3px solid #00f0e8;
+        }
+
+        .glow-sm {
+            box-shadow: 0 0 20px rgba(0, 240, 232, 0.15), 0 0 40px rgba(0, 240, 232, 0.05);
+        }
+
+        .glow {
+            box-shadow: 0 0 30px rgba(0, 240, 232, 0.25), 0 0 60px rgba(0, 240, 232, 0.1);
+        }
+
+        .grid-bg {
+            background-size: 50px 50px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            animation: gridFade 20s ease-in-out infinite;
+        }
+
+        @keyframes gridFade {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(0, 240, 232, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(0, 240, 232, 0.4);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-only {
+            display: none !important;
+        }
+
+        body.is-admin .admin-only {
+            display: flex !important;
+        }
+
+        #heatmapContainer {
+            background: linear-gradient(135deg, #0f0f14 0%, #1a1a22 100%);
+            cursor: grab;
+            border-radius: 12px;
+        }
+
+        #heatmapContainer:active {
+            cursor: grabbing;
+        }
+
+        .heatmap-tooltip {
+            position: absolute;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 240, 232, 0.3);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: white;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.2s ease;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .heatmap-tooltip.show {
+            opacity: 1;
+            transform: translateY(-5px);
+        }
+
+        /* Button hover effects */
+        button,
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:active,
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Input focus effects */
+        input:focus,
+        select:focus {
+            box-shadow: 0 0 0 2px rgba(0, 240, 232, 0.2);
+        }
+
+        /* Table row hover */
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Loading skeleton animation */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        /* Gradient text for headings */
+        .gradient-text {
+            background: linear-gradient(135deg, #00f0e8 0%, #06b6d4 50%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Smooth page transitions */
+        .page-transition {
+            animation: pageSlide 0.3s ease-out;
+        }
+
+        @keyframes pageSlide {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        /* Mobile Overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            opacity: 1;
+        }
+
+        /* Prevent text selection on touch */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Touch-friendly styles */
+        @media (max-width: 1024px) {
+
+            /* Disable page zoom via CSS */
+            html {
+                touch-action: manipulation;
+            }
+
+            .mobile-menu-btn {
+                display: flex !important;
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: white;
+                flex-shrink: 0;
+            }
+
+            .mobile-menu-btn:active {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .mobile-overlay {
+                display: block;
+                pointer-events: none;
+            }
+
+            .mobile-overlay.active {
+                pointer-events: auto;
+            }
+
+            /* Sidebar on mobile - slide in from left */
+            aside.sidebar-mobile {
+                position: fixed;
+                left: 0.5rem;
+                top: 0.5rem;
+                bottom: 0.5rem;
+                height: auto;
+                height: calc(100dvh - 1rem);
+                transform: translateX(calc(-100% - 1rem));
+                transition: transform 0.3s ease;
+                z-index: 25;
+                width: 280px;
+                max-width: 85vw;
+                border-radius: 1rem !important;
+            }
+
+            aside.sidebar-mobile.open {
+                transform: translateX(0);
+            }
+
+            /* Body should not scroll when menu open */
+            body.menu-open {
+                overflow: hidden;
+            }
+
+            /* Body padding on mobile */
+            body {
+                padding: 0.5rem !important;
+                gap: 0.5rem !important;
+            }
+
+            /* Main content - full width */
+            main {
+                width: 100% !important;
+                gap: 0.5rem !important;
+                height: calc(100dvh - 1rem) !important;
+                max-height: calc(100dvh - 1rem) !important;
+                overflow: hidden !important;
+            }
+
+            /* Content scroll area fixes */
+            #contentScroll {
+                padding: 1rem !important;
+                padding-bottom: 6rem !important;
+                border-radius: 1rem !important;
+                -webkit-overflow-scrolling: touch;
+                overflow-y: auto !important;
+                flex: 1 !important;
+                min-height: 0 !important;
+            }
+
+            /* Header adjustments */
+            .main-header {
+                padding: 0.75rem 1rem !important;
+                gap: 0.5rem;
+                border-radius: 1rem !important;
+                min-height: 56px;
+                height: auto !important;
+            }
+
+            .main-header h2 {
+                font-size: 1rem !important;
+            }
+
+            /* Content padding */
+            .content-area {
+                padding: 0.75rem !important;
+            }
+
+            /* Stat cards - 2 columns on tablet, 1 on phone */
+            .stats-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.75rem !important;
+            }
+
+            .stat-card {
+                padding: 1rem !important;
+            }
+
+            .stat-card .text-2xl {
+                font-size: 1.5rem !important;
+            }
+
+            /* Glass panels */
+            .glass-panel {
+                border-radius: 1rem !important;
+            }
+
+            /* Tables - horizontal scroll */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -0.75rem;
+                padding: 0 0.75rem;
+            }
+
+            .table-container table {
+                min-width: 500px;
+            }
+
+            /* Smaller table text */
+            table th,
+            table td {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.8rem !important;
+            }
+
+            /* Heatmap/Analytics section - stack on mobile */
+            #analytics>div {
+                flex-direction: column !important;
+                height: auto !important;
+                gap: 1rem !important;
+            }
+
+            /* Map area full width and fixed height */
+            #analytics>div>div:first-child {
+                min-height: 300px !important;
+                height: 300px !important;
+                flex: none !important;
+            }
+
+            /* Heatmap container */
+            #heatmapContainer {
+                position: relative !important;
+                height: 100% !important;
+                touch-action: pan-x pan-y;
+            }
+
+            /* Hide legend on very small screens */
+            #analytics .absolute.bottom-4.left-4 {
+                display: none !important;
+            }
+
+            /* Side stats panel - full width below map */
+            #analytics aside {
+                width: 100% !important;
+                flex: none !important;
+                max-height: 300px !important;
+            }
+
+            /* Filter sections */
+            .filter-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.75rem !important;
+            }
+
+            /* Buttons - larger touch targets */
+            button,
+            .btn {
+                min-height: 44px;
+                padding: 0.75rem 1rem !important;
+            }
+
+            /* Inputs - larger */
+            input,
+            select {
+                min-height: 44px;
+                font-size: 16px !important;
+                /* Prevents iOS zoom */
+            }
+
+            /* Charts */
+            .chart-container {
+                height: 200px !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+
+            /* Single column stat cards on phone */
+            .stats-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Even smaller header title */
+            .main-header h2 {
+                font-size: 0.875rem !important;
+            }
+
+            /* Stat card text */
+            .stat-card .text-2xl {
+                font-size: 1.25rem !important;
+            }
+
+            .stat-card .text-sm {
+                font-size: 0.75rem !important;
+            }
+
+            /* Hide heatmap zoom controls on very small screens */
+            .heatmap-controls {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            /* User dropdown */
+            .user-dropdown {
+                right: 0.5rem !important;
+                left: auto !important;
+            }
+
+            /* Section headers */
+            h2.text-xl {
+                font-size: 1.125rem !important;
+            }
+
+            /* Charts smaller */
+            .chart-container {
+                height: 180px !important;
+            }
+
+            /* Pagination */
+            .pagination {
+                flex-wrap: wrap;
+                gap: 0.25rem;
+            }
+
+            .pagination button {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 375px) {
+            .mobile-menu-btn {
+                width: 36px;
+                height: 36px;
+            }
+
+            .mobile-menu-btn .material-symbols-outlined {
+                font-size: 20px;
+            }
+
+            .content-area {
+                padding: 0.5rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-bg-dark to-bg-dark-end text-slate-200 min-h-screen overflow-hidden flex p-4 gap-4">
+    <!-- Background Grid Pattern -->
+    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
+
+    <!-- Ambient Background Glow -->
+    <div
+        class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none">
+    </div>
+    <div
+        class="absolute bottom-[-10%] left-[20%] w-[400px] h-[400px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none">
+    </div>
+
+    <!-- Mobile Menu Button moved to header -->
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="sidebar-mobile w-64 z-20 flex flex-col glass-panel rounded-2xl border border-glass-border shrink-0 overflow-hidden">
+        <!-- Brand -->
+        <div class="h-20 flex items-center px-6 border-b border-glass-border/50">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/80 to-cyan-700 flex items-center justify-center glow-sm">
+                    <span class="material-symbols-outlined text-black text-xl font-bold">security</span>
+                </div>
+                <div>
+                    <h1 class="text-white text-lg font-bold tracking-tight">Guardian</h1>
+                    <p class="text-xs text-slate-500 font-medium">v2.0.0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-6 flex flex-col gap-1 overflow-y-auto">
+            <div class="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Hauptmenü</div>
+
+            <a href="#"
+                class="nav-item nav-item-active flex items-center gap-3 px-6 py-3.5 transition-all hover:bg-white/5 group"
+                data-section="dashboard">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a href="#"
+                class="nav-item flex items-center gap-3 px-6 py-3.5 text-slate-400 hover:text-white transition-all hover:bg-white/5 group"
+                data-section="logs">
+                <span class="material-symbols-outlined">description</span>
+                <span class="text-sm font-medium">Logs</span>
+            </a>
+            <a href="#"
+                class="nav-item flex items-center gap-3 px-6 py-3.5 text-slate-400 hover:text-white transition-all hover:bg-white/5 group"
+                data-section="analytics">
+                <span class="material-symbols-outlined">analytics</span>
+                <span class="text-sm font-medium">Analytics</span>
+            </a>
+
+            <div class="admin-only px-4 mt-6 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">System
+            </div>
+            <a href="#"
+                class="nav-item admin-only flex items-center gap-3 px-6 py-3.5 text-slate-400 hover:text-white transition-all hover:bg-white/5 group"
+                data-section="admin">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span class="text-sm font-medium">Admin</span>
+            </a>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-4 border-t border-glass-border/50">
+            <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 cursor-pointer transition-colors">
+                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600"
+                    id="userAvatarContainer">
+                    <span class="material-symbols-outlined text-slate-400" id="userAvatarIcon">person</span>
+                    <img id="userAvatarImg" class="hidden w-full h-full rounded-full object-cover" alt="Avatar">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate" id="sidebarUsername">User</p>
+                    <p class="text-xs text-slate-400 truncate" id="sidebarRole">Rolle</p>
+                </div>
+                <button onclick="logout()" class="text-slate-500 hover:text-red-400 transition-colors" title="Abmelden">
+                    <span class="material-symbols-outlined text-lg">logout</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden relative z-10 gap-4">
+        <!-- Top Navbar -->
+        <header
+            class="main-header h-16 flex items-center justify-between px-6 glass-panel rounded-2xl border border-glass-border shrink-0">
+            <div class="flex items-center gap-4">
+                <!-- Mobile Menu Button (inside header) -->
+                <button class="mobile-menu-btn hidden md:hidden" id="mobileMenuBtn" onclick="toggleMobileMenu()"
+                    style="display: none;">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span
+                        class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse"></span>
+                    <h2 class="text-lg font-bold text-white" id="pageTitle">Dashboard</h2>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Search -->
+                <div
+                    class="hidden md:flex items-center bg-black/20 border border-glass-border rounded-full px-4 h-10 w-64 focus-within:border-primary/50 transition-all">
+                    <span class="material-symbols-outlined text-slate-500 text-xl">search</span>
+                    <input type="text" id="globalSearch"
+                        class="bg-transparent border-none text-sm text-white placeholder-slate-500 focus:ring-0 w-full ml-2"
+                        placeholder="Suche...">
+                </div>
+
+                <!-- World Selector -->
+                <select id="globalWorldFilter"
+                    class="bg-black/20 border border-glass-border rounded-full px-4 h-10 text-sm text-white focus:ring-0 focus:border-primary/50">
+                    <option value="">Alle Welten</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Content Scroll Area -->
+        <div id="contentScroll"
+            class="flex-1 overflow-y-auto glass-panel rounded-2xl border border-glass-border p-6 lg:p-8">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active max-w-7xl mx-auto space-y-6">
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <!-- Stat Card: Blocks Placed -->
+                    <div
+                        class="stat-card glass-panel p-6 rounded-2xl group hover:border-emerald-500/30 transition-all hover:glow-sm relative overflow-hidden">
+                        <div
+                            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity text-emerald-400">
+                            <span class="material-symbols-outlined text-5xl">add_box</span>
+                        </div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Blöcke platziert</p>
+                        <h3 class="text-3xl font-bold stat-value tabular-nums" id="statBlocksPlaced">-</h3>
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                        </div>
+                    </div>
+
+                    <!-- Stat Card: Blocks Broken -->
+                    <div
+                        class="stat-card glass-panel p-6 rounded-2xl group hover:border-red-500/30 transition-all hover:glow-sm relative overflow-hidden">
+                        <div
+                            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity text-red-400">
+                            <span class="material-symbols-outlined text-5xl">delete</span>
+                        </div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Blöcke zerstört</p>
+                        <h3 class="text-3xl font-bold stat-value tabular-nums" id="statBlocksBroken">-</h3>
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                        </div>
+                    </div>
+
+                    <!-- Stat Card: Items Added -->
+                    <div
+                        class="stat-card glass-panel p-6 rounded-2xl group hover:border-amber-500/30 transition-all hover:glow-sm relative overflow-hidden">
+                        <div
+                            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity text-amber-400">
+                            <span class="material-symbols-outlined text-5xl">inventory_2</span>
+                        </div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Items hinzugefügt</p>
+                        <h3 class="text-3xl font-bold stat-value tabular-nums" id="statItemsAdded">-</h3>
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                        </div>
+                    </div>
+
+                    <!-- Stat Card: Unique Players -->
+                    <div
+                        class="stat-card glass-panel p-6 rounded-2xl group border-primary/30 glow-sm relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-cyan-500/5 to-transparent">
+                        </div>
+                        <div class="absolute top-0 right-0 p-4 opacity-30 text-primary">
+                            <span class="material-symbols-outlined text-5xl">group</span>
+                        </div>
+                        <p class="text-primary text-sm font-semibold mb-2 relative z-10">Spieler</p>
+                        <h3 class="text-3xl font-bold gradient-text tabular-nums relative z-10" id="statUniquePlayers">-
+                        </h3>
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-cyan-500 opacity-60">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Chart -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Aktivität (24h)</h3>
+                            <p class="text-slate-400 text-sm">Block- und Container-Aktionen</p>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Players -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">Top Spieler</h3>
+                    <div class="space-y-3" id="topPlayersList">
+                        <div class="text-slate-500 text-sm">Laden...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Logs Section -->
+            <section id="logs" class="section max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <!-- Block Logs Panel -->
+                    <div class="glass-panel rounded-2xl overflow-hidden flex flex-col h-[600px]">
+                        <div class="p-5 border-b border-glass-border flex items-center justify-between bg-white/5">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                                    <span class="material-symbols-outlined">grid_view</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-semibold">Block-Logs</h3>
+                                    <p class="text-xs text-slate-400">Platzierte & zerstörte Blöcke</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="blockPlayerFilter" placeholder="Spieler..."
+                                    class="bg-black/30 border border-glass-border rounded-lg px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:ring-0 focus:border-primary/50 w-32">
+                                <button onclick="searchBlockLogs()"
+                                    class="px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm font-medium hover:bg-primary/30 transition-colors">
+                                    <span class="material-symbols-outlined text-sm">search</span>
+                                </button>
+                                <button onclick="exportBlockLogs()"
+                                    class="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-sm hover:bg-white/10 transition-colors"
+                                    title="CSV Export">
+                                    <span class="material-symbols-outlined text-sm">download</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto">
+                            <table class="w-full text-left">
+                                <thead class="sticky top-0 bg-[#12141d] z-10">
+                                    <tr class="text-xs text-slate-500 uppercase tracking-wider">
+                                        <th class="px-4 py-3 font-medium">Zeit</th>
+                                        <th class="px-4 py-3 font-medium">Spieler</th>
+                                        <th class="px-4 py-3 font-medium">Aktion</th>
+                                        <th class="px-4 py-3 font-medium">Block</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="blockLogsBody" class="divide-y divide-glass-border text-sm"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-3 border-t border-glass-border flex justify-center gap-2" id="blockPagination">
+                        </div>
+                    </div>
+
+                    <!-- Container Logs Panel -->
+                    <div class="glass-panel rounded-2xl overflow-hidden flex flex-col h-[600px]">
+                        <div class="p-5 border-b border-glass-border flex items-center justify-between bg-white/5">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                                    <span class="material-symbols-outlined">inventory_2</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-semibold">Container-Logs</h3>
+                                    <p class="text-xs text-slate-400">Item-Bewegungen</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="containerPlayerFilter" placeholder="Spieler..."
+                                    class="bg-black/30 border border-glass-border rounded-lg px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:ring-0 focus:border-primary/50 w-32">
+                                <button onclick="searchContainerLogs()"
+                                    class="px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm font-medium hover:bg-primary/30 transition-colors">
+                                    <span class="material-symbols-outlined text-sm">search</span>
+                                </button>
+                                <button onclick="exportContainerLogs()"
+                                    class="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-sm hover:bg-white/10 transition-colors"
+                                    title="CSV Export">
+                                    <span class="material-symbols-outlined text-sm">download</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto">
+                            <table class="w-full text-left">
+                                <thead class="sticky top-0 bg-[#12141d] z-10">
+                                    <tr class="text-xs text-slate-500 uppercase tracking-wider">
+                                        <th class="px-4 py-3 font-medium">Zeit</th>
+                                        <th class="px-4 py-3 font-medium">Spieler</th>
+                                        <th class="px-4 py-3 font-medium">Aktion</th>
+                                        <th class="px-4 py-3 font-medium">Item</th>
+                                        <th class="px-4 py-3 font-medium">Menge</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="containerLogsBody" class="divide-y divide-glass-border text-sm"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-3 border-t border-glass-border flex justify-center gap-2"
+                            id="containerPagination"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="section overflow-y-auto max-h-[calc(100vh-6rem)]">
+                <div class="space-y-6 pb-8">
+                    <!-- Period Selector -->
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary text-3xl">analytics</span>
+                            Server Analytics
+                        </h2>
+                        <div class="flex items-center gap-3">
+                            <select id="analyticsPeriod"
+                                class="bg-black/30 border border-glass-border rounded-xl px-4 py-2 text-white text-sm">
+                                <option value="24h">Letzte 24 Stunden</option>
+                                <option value="7d" selected>Letzte 7 Tage</option>
+                                <option value="30d">Letzte 30 Tage</option>
+                            </select>
+                            <button id="refreshAnalytics"
+                                class="bg-primary/20 hover:bg-primary/30 text-primary px-4 py-2 rounded-xl text-sm flex items-center gap-2 transition-colors">
+                                <span class="material-symbols-outlined text-sm">refresh</span>
+                                Aktualisieren
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Peak Hours -->
+                        <div class="glass-panel rounded-2xl p-5">
+                            <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-xl">schedule</span>
+                                Peak Stunden
+                            </h3>
+                            <div class="h-64">
+                                <canvas id="peakHoursChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Block Types -->
+                        <div class="glass-panel rounded-2xl p-5">
+                            <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-xl">deployed_code</span>
+                                Top Block-Typen
+                            </h3>
+                            <div class="h-64">
+                                <canvas id="blockTypesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Builder -->
+                    <div class="glass-panel rounded-2xl p-5">
+                        <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-xl">build</span>
+                            Chart Builder
+                            <span class="text-xs text-slate-400 font-normal ml-2">Erstelle eigene Diagramme</span>
+                        </h3>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1">X-Achse</label>
+                                <select id="chartBuilderX"
+                                    class="w-full bg-black/30 border border-glass-border rounded-lg px-3 py-2 text-white text-sm">
+                                    <option value="time">Zeit</option>
+                                    <option value="player">Spieler</option>
+                                    <option value="world">Welt</option>
+                                    <option value="block">Block-Typ</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1">Y-Achse</label>
+                                <select id="chartBuilderY"
+                                    class="w-full bg-black/30 border border-glass-border rounded-lg px-3 py-2 text-white text-sm">
+                                    <option value="count">Anzahl Aktionen</option>
+                                    <option value="blocks_broken">Blöcke abgebaut</option>
+                                    <option value="blocks_placed">Blöcke platziert</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1">Chart-Typ</label>
+                                <select id="chartBuilderType"
+                                    class="w-full bg-black/30 border border-glass-border rounded-lg px-3 py-2 text-white text-sm">
+                                    <option value="bar">Balken</option>
+                                    <option value="line">Linie</option>
+                                    <option value="doughnut">Donut</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1">Filter (optional)</label>
+                                <input type="text" id="chartBuilderFilter" placeholder="player:Steve"
+                                    class="w-full bg-black/30 border border-glass-border rounded-lg px-3 py-2 text-white text-sm placeholder-slate-500">
+                            </div>
+                        </div>
+
+                        <button id="generateCustomChart"
+                            class="bg-primary/20 hover:bg-primary/30 text-primary px-4 py-2 rounded-lg text-sm mb-4 transition-colors">
+                            Diagramm generieren
+                        </button>
+
+                        <div class="h-64">
+                            <canvas id="customChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Admin Only: Hotspots with Coordinates -->
+                    <div id="adminHotspotsSection" class="glass-panel rounded-2xl p-5" style="display: none;">
+                        <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-red-400 text-xl">admin_panel_settings</span>
+                            Admin: Aktivitäts-Hotspots
+                            <span class="text-xs text-red-400 font-normal ml-2">Mit Koordinaten</span>
+                        </h3>
+                        <div id="hotspotsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div class="text-slate-500 text-sm">Laden...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Section -->
+            <section id="admin" class="section max-w-7xl mx-auto space-y-6">
+                <!-- Admin Content -->
+                <div class="space-y-6">
+                    <!-- User Management -->
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-symbols-outlined text-primary">manage_accounts</span>
+                            <h3 class="text-xl font-bold text-white">Benutzer verwalten</h3>
+                            <p class="text-slate-400 text-sm ml-2">Web-Interface Zugänge</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5">
+                            <tr class="text-xs text-slate-400 uppercase tracking-wider">
+                                <th class="px-6 py-4 font-medium">Benutzer</th>
+                                <th class="px-6 py-4 font-medium">Minecraft</th>
+                                <th class="px-6 py-4 font-medium">Rolle</th>
+                                <th class="px-6 py-4 font-medium">Registriert</th>
+                                <th class="px-6 py-4 font-medium text-right">Aktion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody" class="divide-y divide-glass-border text-sm"></tbody>
+                    </table>
+                </div>
+        </div>
+        </section>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            const body = document.body;
+
+            const isOpen = sidebar.classList.contains('open');
+
+            if (isOpen) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                body.classList.remove('menu-open');
+                menuBtn.querySelector('span').textContent = 'menu';
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+                body.classList.add('menu-open');
+                menuBtn.querySelector('span').textContent = 'close';
+            }
+        }
+
+        // Close mobile menu when clicking nav items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar.classList.contains('open')) {
+                        toggleMobileMenu();
+                    }
+                }
+            });
+        });
+
+        // Close menu on resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobileOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                document.body.classList.remove('menu-open');
+                document.getElementById('mobileMenuBtn').querySelector('span').textContent = 'menu';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+# Guardian Configuration
+
+# Setup Status - DO NOT EDIT MANUALLY
+setup:
+  completed: false
+
+# Timezone for correct time display (e.g., Europe/Berlin, America/New_York)
+timezone: "Europe/Berlin"
+
+# Web Interface Settings
+web:
+  # Enable or disable the web interface
+  enabled: true
+  
+  # Port for the web server
+  port: 6746
+  
+  # Host address (0.0.0.0 = all interfaces, 127.0.0.1 = localhost only)
+  host: "0.0.0.0"
+  
+  # Server IP for links (leave empty for auto-detection)
+  # Set this if auto-detection picks the wrong IP
+  server-ip: ""
+  
+  # JWT secret for authentication tokens
+  # IMPORTANT: Change this to a random string in production!
+  jwt-secret: "CHANGE-ME-TO-SOMETHING-RANDOM-AND-SECURE"
+  
+  # Registration code expiry time in minutes
+  registration-expiry-minutes: 10
+
+# Map Integration (BlueMap)
+map:
+  # Enable BlueMap integration for the heatmap
+  enabled: true
+  
+  # BlueMap web URL (e.g., http://localhost:8100)
+  # Leave empty to use the heatmap without a map background
+  bluemap-url: ""
+  
+  # Default world to show on the map
+  default-world: "world"
+  
+  # Marker update interval in minutes
+  marker-update-interval: 5
