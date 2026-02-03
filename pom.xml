@@ -6,7 +6,7 @@
 
     <groupId>ms</groupId>
     <artifactId>Guardian</artifactId>
-    <version>1.0</version>
+    <version>2.0</version>
     <packaging>jar</packaging>
 
     <name>Guardian</name>
@@ -25,6 +25,10 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>bluecolored</id>
+            <url>https://repo.bluecolored.de/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -37,6 +41,52 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.46.0.0</version> <scope>compile</scope> </dependency>
+        <!-- Web Interface Dependencies -->
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin</artifactId>
+            <version>6.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        <!-- SLF4J for Javalin logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <!-- Jackson for JWT -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.2</version>
+        </dependency>
+        <!-- Kotlin stdlib for Javalin -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>1.9.22</version>
+        </dependency>
+        <!-- BlueMap API (soft dependency) -->
+        <dependency>
+            <groupId>de.bluecolored</groupId>
+            <artifactId>bluemap-api</artifactId>
+            <version>2.7.7</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -62,11 +112,35 @@
                     </goals>
                     <configuration>
                         <createDependencyReducedPom>false</createDependencyReducedPom>
+                        <minimizeJar>true</minimizeJar>
                         <artifactSet>
                             <includes>
                                 <include>org.xerial:sqlite-jdbc</include>
+                                <include>io.javalin:*</include>
+                                <include>com.auth0:java-jwt</include>
+                                <include>org.mindrot:jbcrypt</include>
+                                <include>com.google.code.gson:gson</include>
+                                <include>org.slf4j:*</include>
+                                <include>org.eclipse.jetty:*</include>
+                                <include>jakarta.servlet:*</include>
+                                <include>org.eclipse.jetty.toolchain:*</include>
+                                <include>org.jetbrains.kotlin:kotlin-stdlib</include>
+                                <include>com.fasterxml.jackson.core:*</include>
                             </includes>
                         </artifactSet>
+                        <filters>
+                            <filter>
+                                <artifact>*:*</artifact>
+                                <excludes>
+                                    <exclude>META-INF/*.SF</exclude>
+                                    <exclude>META-INF/*.DSA</exclude>
+                                    <exclude>META-INF/*.RSA</exclude>
+                                    <exclude>META-INF/MANIFEST.MF</exclude>
+                                    <exclude>META-INF/versions/**</exclude>
+                                    <exclude>**/module-info.class</exclude>
+                                </excludes>
+                            </filter>
+                        </filters>
                     </configuration>
                 </execution>
             </executions>
