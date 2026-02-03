@@ -45,7 +45,7 @@
 
 ## 🌐 Web Dashboard
 
-Access the dashboard at `http://your-server-ip:7070` after installation.
+Access the dashboard at `http://your-server-ip:6746` after installation.
 
 ### Features
 - 📈 Real-time analytics and charts
@@ -123,3 +123,4 @@ Toggle with `/inspect` for interactive lookups:
 **Made with ❤️ by Frxme**
 
 </div>
+
